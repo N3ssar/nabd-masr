@@ -65,6 +65,9 @@ export default function NewsArticle({
           height="200"
           image={urlToImage || FALLBACK_IMAGE}
           alt={title}
+          onError={(e) => {
+            e.currentTarget.src = FALLBACK_IMAGE;
+          }}
         />
         <CardContent sx={{ flexGrow: 1 }}>
           <Typography

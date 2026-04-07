@@ -20,3 +20,7 @@ export interface ArticlesListProps {
 export interface LayoutProps {
   children: ReactNode;
 }
+
+export interface HeaderProps {
+  onSearchChange: (query: string) => void;
+}
