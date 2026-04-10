@@ -65,15 +65,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function Navbar({ onSearchChange }: HeaderProps) {
+function Header({ onSearchChange }: HeaderProps) {
   const [category, setCategory] = useState("general");
-
   const handleCategoryChange = (event: SelectChangeEvent) => {
     setCategory(event.target.value);
   };
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: "primary.main" }}>
+    <AppBar
+      position="sticky"
+      sx={{ backgroundColor: "primary.main", marginBottom: 3 }}
+    >
       <Container maxWidth="lg">
         <Toolbar disableGutters>
           <Typography
@@ -147,3 +149,4 @@ export default function Navbar({ onSearchChange }: HeaderProps) {
     </AppBar>
   );
 }
+export default Header;

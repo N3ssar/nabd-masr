@@ -24,3 +24,10 @@ export interface LayoutProps {
 export interface HeaderProps {
   onSearchChange: (query: string) => void;
 }
+
+export interface ArticlesListProps {
+  articles: ApiArticle[];
+  isLoading: boolean;
+  query: string;
+  error: { type: string; message: string } | null;
+}
