@@ -24,12 +24,14 @@ function App() {
   const [error, setError] = useState<{ type: string; message: string } | null>(
     null,
   );
+  const [category, setCategory] = useState("general");
 
   const handleSearchInput = (newText: string) => {
     setIsLoading(true);
     setQuery(newText);
     setPage(1);
   };
+
   const handlePageChange = (_: React.ChangeEvent<unknown>, newPage: number) => {
     setIsLoading(true);
     setPage(newPage);
@@ -39,13 +41,31 @@ function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleCategoryChange = (newCategory: string) => {
+    setIsLoading(true);
+    setCategory(newCategory);
+    setPage(1);
+  };
+
   const totalPages = Math.ceil(totalResults / MAX_ARTICLES_PER_PAGE);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       const cleanQuery = query.trim();
 
-      const searchQuery = cleanQuery ? `مصر ${cleanQuery}` : "مصر";
+      const categoryKeywords: Record<string, string> = {
+        general: "مصر",
+        business: "اقتصاد مصر OR بورصة مصر OR أعمال مصر",
+        sports: "رياضة مصر OR كرة القدم المصرية",
+        technology: "تكنولوجيا مصر OR تقنية مصر",
+        health: "صحة مصر OR طب مصر",
+      };
+
+      let searchQuery = categoryKeywords[category] || "مصر";
+      if (cleanQuery) {
+        searchQuery += ` ${cleanQuery}`;
+      }
+
       const encodedQuery = encodeURIComponent(searchQuery);
 
       getAllArticles(
@@ -54,11 +74,12 @@ function App() {
         .then((data) => {
           if (data && data.articles && data.articles.length > 0) {
             setArticles(data.articles);
-            setTotalResults(Math.min(data.totalResults, 100));
+            setTotalResults(Math.min(data.totalResults, 99));
           } else {
             setArticles([]);
             setTotalResults(0);
           }
+          setError(null);
         })
         .catch((error) => {
           if (!navigator.onLine) {
@@ -66,11 +87,17 @@ function App() {
               type: "NETWORK",
               message: "يبدو أنك غير متصل بالإنترنت.",
             });
-          } else if (error.response?.status === 429) {
+          } else if (error.status === 429) {
             setError({
               type: "RATE_LIMIT",
               message:
                 "لقد تجاوزت عدد الطلبات المسموح بها، يرجى الانتظار دقيقة.",
+            });
+          } else if (error.status === 426) {
+            setError({
+              type: "UPGRADE_REQUIRED",
+              message:
+                "عذراً، وصلنا للحد الأقصى من الأخبار المتاحة في النسخة المجانية.",
             });
           } else {
             setError({
@@ -85,12 +112,16 @@ function App() {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query, page]);
+  }, [query, page, category]);
 
   return (
     <>
       <CssBaseline />
-      <Header onSearchChange={handleSearchInput} />
+      <Header
+        onSearchChange={handleSearchInput}
+        category={category}
+        onCategoryChange={handleCategoryChange}
+      />
       <Layout>
         <ArticlesList
           articles={articles}
@@ -99,7 +130,7 @@ function App() {
           error={error}
         />
 
-        {!isLoading && totalPages > 1 && (
+        {!isLoading && totalPages > 1 && !error && (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 6, mb: 4 }}>
             <Pagination
               count={totalPages}
@@ -112,11 +143,13 @@ function App() {
                 if (item.type === "previous") {
                   return (
                     <Tooltip title="السابق" placement="top" arrow>
-                      <PaginationItem
-                        {...item}
-                        aria-label="الرجوع للصفحة السابقة"
-                        sx={{ "& svg": { transform: "scaleX(-1)" } }}
-                      />
+                      <span>
+                        <PaginationItem
+                          {...item}
+                          aria-label="الرجوع للصفحة السابقة"
+                          sx={{ "& svg": { transform: "scaleX(-1)" } }}
+                        />
+                      </span>
                     </Tooltip>
                   );
                 }
@@ -124,11 +157,13 @@ function App() {
                 if (item.type === "next") {
                   return (
                     <Tooltip title="التالي" placement="top" arrow>
-                      <PaginationItem
-                        {...item}
-                        aria-label="الانتقال للصفحة التالية"
-                        sx={{ "& svg": { transform: "scaleX(-1)" } }}
-                      />
+                      <span>
+                        <PaginationItem
+                          {...item}
+                          aria-label="الانتقال للصفحة التالية"
+                          sx={{ "& svg": { transform: "scaleX(-1)" } }}
+                        />
+                      </span>
                     </Tooltip>
                   );
                 }

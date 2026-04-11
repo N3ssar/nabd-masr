@@ -16,9 +16,16 @@ const StyledCard = styled(Card)(({ theme }) => ({
   height: "100%",
   display: "flex",
   flexDirection: "column",
-  transition: "box-shadow 0.3s ease-in-out",
+  transition: "box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out",
+
+  "& .MuiCardMedia-root": {
+    transition: "transform 0.4s ease-in-out",
+  },
+
   "&:hover": {
-    boxShadow: theme.shadows[4],
+    boxShadow: theme.shadows[6],
+    transform: "translateY(-4px)",
+
     "& .MuiCardMedia-root": {
       transform: "scale(1.05)",
     },
@@ -67,13 +74,10 @@ export default function NewsArticle({
         <CardMedia
           component="img"
           height="200"
-          image={urlToImage || FALLBACK_IMAGE}
+          image={urlToImage || "/default-news.jpg"}
           alt={title}
           onError={(e) => {
             e.currentTarget.src = FALLBACK_IMAGE;
-          }}
-          sx={{
-            transition: "transform 0.4s ease-in-out",
           }}
         />
         <CardContent sx={{ flexGrow: 1, width: "100%" }}>

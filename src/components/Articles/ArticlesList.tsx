@@ -8,8 +8,9 @@ import WifiOffIcon from "@mui/icons-material/WifiOff";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
-export default function NewsList({
+export default function ArticlesList({
   articles,
   isLoading,
   error,
@@ -31,8 +32,10 @@ export default function NewsList({
 
   if (error) {
     let ErrorIcon = ErrorOutlineIcon;
+
     if (error.type === "NETWORK") ErrorIcon = WifiOffIcon;
     if (error.type === "RATE_LIMIT") ErrorIcon = HourglassEmptyIcon;
+    if (error.type === "UPGRADE_REQUIRED") ErrorIcon = LockOutlinedIcon;
 
     return (
       <Box
@@ -45,7 +48,9 @@ export default function NewsList({
           variant="h5"
           sx={{ fontFamily: "'Cairo', sans-serif", fontWeight: "bold", mb: 1 }}
         >
-          عذراً، واجهتنا مشكلة
+          {error.type === "UPGRADE_REQUIRED"
+            ? "تنبيه الحد الأقصى"
+            : "عذراً، واجهتنا مشكلة"}
         </Typography>
         <Typography variant="body1" sx={{ fontFamily: "'Cairo', sans-serif" }}>
           {error.message}

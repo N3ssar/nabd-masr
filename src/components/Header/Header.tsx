@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -65,10 +64,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-function Header({ onSearchChange }: HeaderProps) {
-  const [category, setCategory] = useState("general");
+function Header({ onSearchChange , category, onCategoryChange }: HeaderProps) {
   const handleCategoryChange = (event: SelectChangeEvent) => {
-    setCategory(event.target.value);
+    onCategoryChange(event.target.value);
   };
 
   return (

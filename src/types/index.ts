@@ -22,7 +22,9 @@ export interface LayoutProps {
 }
 
 export interface HeaderProps {
+  category: string;
   onSearchChange: (query: string) => void;
+  onCategoryChange: (category: string) => void;
 }
 
 export interface ArticlesListProps {
