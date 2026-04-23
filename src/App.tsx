@@ -68,9 +68,11 @@ function App() {
 
       const encodedQuery = encodeURIComponent(searchQuery);
 
-      getAllArticles(
-        `https://newsapi.org/v2/everything?q=${encodedQuery}&language=ar&sortBy=publishedAt&page=${page}&pageSize=${MAX_ARTICLES_PER_PAGE}&apiKey=${NEWS_API_KEY}`,
-      )
+      const targetUrl = `https://newsapi.org/v2/everything?q=${encodedQuery}&language=ar&sortBy=publishedAt&page=${page}&pageSize=${MAX_ARTICLES_PER_PAGE}&apiKey=${NEWS_API_KEY}`;
+
+      const proxiedUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+
+      getAllArticles(proxiedUrl)
         .then((data) => {
           if (data && data.articles && data.articles.length > 0) {
             setArticles(data.articles);
@@ -87,13 +89,13 @@ function App() {
               type: "NETWORK",
               message: "يبدو أنك غير متصل بالإنترنت.",
             });
-          } else if (error.status === 429) {
+          } else if (error.status === 429 || error.response?.status === 429) {
             setError({
               type: "RATE_LIMIT",
               message:
                 "لقد تجاوزت عدد الطلبات المسموح بها، يرجى الانتظار دقيقة.",
             });
-          } else if (error.status === 426) {
+          } else if (error.status === 426 || error.response?.status === 426) {
             setError({
               type: "UPGRADE_REQUIRED",
               message:
